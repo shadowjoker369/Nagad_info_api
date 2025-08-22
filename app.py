@@ -22,17 +22,19 @@ def fetch_nagad(number):
     params = {"msisdn": number}
     try:
         response = requests.get(NAGAD_URL, headers=headers, params=params, timeout=30, verify=False)
-        if response.status_code == 200:
-            result = response.json()
-            result["api_owner"] = "Shadow Joker"
-            result["number"] = number
-            return result
-        else:
+        try:
+            data = response.json()  # JSON decode attempt
+        except ValueError:
             return {
-                "error": f"{response.status_code}: {response.text}",
+                "error": f"Invalid or empty response from Nagad API (status {response.status_code})",
                 "api_owner": "Shadow Joker",
                 "number": number
             }
+
+        data["api_owner"] = "Shadow Joker"
+        data["number"] = number
+        return data
+
     except requests.Timeout:
         return {"error": "Request timed out after 30 seconds", "api_owner": "Shadow Joker", "number": number}
     except requests.RequestException as e:
