@@ -9,8 +9,11 @@ NAGAD_URL = "https://app2.mynagad.com:20002/api/user/check-user-status-for-log-i
 def check_user():
     try:
         data = request.get_json()
-        number = data.get("msisdn")
 
+        # msisdn বা number key উভয়ই গ্রহণ করবে
+        number = data.get("msisdn") or data.get("number")
+
+        # Validation
         if not number or not number.isdigit() or len(number) != 11 or not number.startswith("01"):
             return jsonify({"error": "Invalid Bangladeshi number format"}), 400
 
@@ -39,7 +42,8 @@ def check_user():
 
 @app.route("/")
 def home():
-    return " Nagad Checker Backend is running. Use POST /check"
+    return "Nagad Checker Backend is running. Use POST /check"
+
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
